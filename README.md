@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # RESTful Blog API
 
 A RESTful Blog API built with **Node.js**, **Express**, and **MongoDB**, featuring JWT-based authentication & authorization.
@@ -143,7 +142,3 @@ Authorization: Bearer <your_token>
 | Auth | JSON Web Token (JWT) |
 | Password | bcryptjs |
 | Slug | slugify |
-=======
-# RESTful-Blog-API
-Xây dựng RESTful Blog API với Authentication &amp; Authorization
->>>>>>> 9881a199a6e83e7e891206ab8647cd8277cd7c3c
