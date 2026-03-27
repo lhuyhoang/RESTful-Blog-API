@@ -1,0 +1,10 @@
+node_modules/
+.env
+*.log
+.DS_Store
+dist/
+
+# Personal notes
+Needtodo.md
+Task.md
+Task.Md
