@@ -5,9 +5,9 @@ const PostSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: [true, 'Please add a title'],
+      required: [true, 'Vui lòng nhập tiêu đề'],
       trim: true,
-      maxlength: [200, 'Title cannot be more than 200 characters'],
+      maxlength: [200, 'Tiêu đề không được vượt quá 200 ký tự'],
     },
     slug: {
       type: String,
@@ -15,11 +15,11 @@ const PostSchema = new mongoose.Schema(
     },
     content: {
       type: String,
-      required: [true, 'Please add content'],
+      required: [true, 'Vui lòng nhập nội dung'],
     },
     excerpt: {
       type: String,
-      maxlength: [500, 'Excerpt cannot be more than 500 characters'],
+      maxlength: [500, 'Tóm tắt không được vượt quá 500 ký tự'],
     },
     coverImage: {
       type: String,
@@ -53,19 +53,19 @@ const PostSchema = new mongoose.Schema(
   }
 );
 
-// Auto-generate slug from title
+// Tự động tạo slug từ tiêu đề
 PostSchema.pre('save', function (next) {
   if (this.isModified('title')) {
     this.slug = slugify(this.title, { lower: true, strict: true }) + '-' + Date.now();
   }
-  // Auto-generate excerpt from content if not provided
+  // Tự động tạo excerpt từ nội dung nếu chưa có
   if (!this.excerpt && this.content) {
     this.excerpt = this.content.substring(0, 200) + '...';
   }
   next();
 });
 
-// Virtual: comment count
+// Virtual: số lượng bình luận của bài viết
 PostSchema.virtual('commentCount', {
   ref: 'Comment',
   localField: '_id',
@@ -73,7 +73,7 @@ PostSchema.virtual('commentCount', {
   count: true,
 });
 
-// Index for search
+// Index cho tìm kiếm full-text
 PostSchema.index({ title: 'text', content: 'text', tags: 'text' });
 
 module.exports = mongoose.model('Post', PostSchema);

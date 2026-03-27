@@ -2,9 +2,9 @@ const User = require('../models/User');
 const asyncHandler = require('../middleware/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 
-// @desc    Get all users
+// @desc    Lấy danh sách tất cả người dùng
 // @route   GET /api/users
-// @access  Private (admin)
+// @access  Riêng tư (chỉ admin)
 exports.getUsers = asyncHandler(async (req, res, next) => {
   const page = parseInt(req.query.page, 10) || 1;
   const limit = parseInt(req.query.limit, 10) || 20;
@@ -16,40 +16,40 @@ exports.getUsers = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, count: users.length, total, page, data: users });
 });
 
-// @desc    Get single user
+// @desc    Lấy thông tin một người dùng
 // @route   GET /api/users/:id
-// @access  Private (admin)
+// @access  Riêng tư (chỉ admin)
 exports.getUser = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.params.id);
-  if (!user) return next(new ErrorResponse('User not found', 404));
+  if (!user) return next(new ErrorResponse('Không tìm thấy người dùng', 404));
   res.status(200).json({ success: true, data: user });
 });
 
-// @desc    Update user
+// @desc    Cập nhật thông tin người dùng
 // @route   PUT /api/users/:id
-// @access  Private (admin)
+// @access  Riêng tư (chỉ admin)
 exports.updateUser = asyncHandler(async (req, res, next) => {
-  // Prevent password update through this route
+  // Không cho phép cập nhật mật khẩu qua route này
   delete req.body.password;
 
   const user = await User.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
   });
-  if (!user) return next(new ErrorResponse('User not found', 404));
+  if (!user) return next(new ErrorResponse('Không tìm thấy người dùng', 404));
   res.status(200).json({ success: true, data: user });
 });
 
-// @desc    Delete user
+// @desc    Xóa người dùng
 // @route   DELETE /api/users/:id
-// @access  Private (admin)
+// @access  Riêng tư (chỉ admin)
 exports.deleteUser = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.params.id);
-  if (!user) return next(new ErrorResponse('User not found', 404));
+  if (!user) return next(new ErrorResponse('Không tìm thấy người dùng', 404));
 
-  // Prevent admin from deleting themselves
+  // Admin không thể tự xóa tài khoản của mình
   if (user._id.toString() === req.user.id) {
-    return next(new ErrorResponse('Admin cannot delete their own account through this route', 400));
+    return next(new ErrorResponse('Admin không thể tự xóa tài khoản của mình qua route này', 400));
   }
 
   await User.findByIdAndDelete(req.params.id);

@@ -3,12 +3,12 @@ const Post = require('../models/Post');
 const asyncHandler = require('../middleware/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 
-// @desc    Get comments for a post
+// @desc    Lấy danh sách bình luận của một bài viết
 // @route   GET /api/posts/:postId/comments
-// @access  Public
+// @access  Công khai
 exports.getComments = asyncHandler(async (req, res, next) => {
   const post = await Post.findById(req.params.postId);
-  if (!post) return next(new ErrorResponse('Post not found', 404));
+  if (!post) return next(new ErrorResponse('Không tìm thấy bài viết', 404));
 
   const [topLevelComments, replies] = await Promise.all([
     Comment.find({ post: req.params.postId, parentComment: null })
@@ -19,7 +19,7 @@ exports.getComments = asyncHandler(async (req, res, next) => {
       .sort({ createdAt: 1 }),
   ]);
 
-  // Group replies by their parentComment id
+  // Nhóm các reply theo parentComment id
   const replyMap = {};
   replies.forEach((reply) => {
     const parentId = reply.parentComment.toString();
@@ -27,7 +27,7 @@ exports.getComments = asyncHandler(async (req, res, next) => {
     replyMap[parentId].push(reply);
   });
 
-  // Attach replies to their parent comments
+  // Gắn replies vào comment cha tương ứng
   const comments = topLevelComments.map((comment) => {
     const commentObj = comment.toObject();
     commentObj.replies = replyMap[comment._id.toString()] || [];
@@ -37,12 +37,12 @@ exports.getComments = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, count: comments.length, data: comments });
 });
 
-// @desc    Add comment to a post
+// @desc    Thêm bình luận vào bài viết
 // @route   POST /api/posts/:postId/comments
-// @access  Private
+// @access  Riêng tư
 exports.addComment = asyncHandler(async (req, res, next) => {
   const post = await Post.findById(req.params.postId);
-  if (!post) return next(new ErrorResponse('Post not found', 404));
+  if (!post) return next(new ErrorResponse('Không tìm thấy bài viết', 404));
 
   const comment = await Comment.create({
     content: req.body.content,
@@ -55,33 +55,33 @@ exports.addComment = asyncHandler(async (req, res, next) => {
   res.status(201).json({ success: true, data: comment });
 });
 
-// @desc    Delete comment
+// @desc    Xóa bình luận
 // @route   DELETE /api/comments/:id
-// @access  Private (owner or admin)
+// @access  Riêng tư (chủ sở hữu hoặc admin)
 exports.deleteComment = asyncHandler(async (req, res, next) => {
   const comment = await Comment.findById(req.params.id);
-  if (!comment) return next(new ErrorResponse('Comment not found', 404));
+  if (!comment) return next(new ErrorResponse('Không tìm thấy bình luận', 404));
 
   if (comment.author.toString() !== req.user.id && req.user.role !== 'admin') {
-    return next(new ErrorResponse('Not authorized to delete this comment', 403));
+    return next(new ErrorResponse('Bạn không có quyền xóa bình luận này', 403));
   }
 
-  // Also delete child replies
+  // Xóa cả các reply con
   await Comment.deleteMany({ parentComment: comment._id });
   await Comment.findByIdAndDelete(req.params.id);
 
   res.status(200).json({ success: true, data: {} });
 });
 
-// @desc    Update comment
+// @desc    Cập nhật bình luận
 // @route   PUT /api/comments/:id
-// @access  Private (owner only)
+// @access  Riêng tư (chỉ chủ sở hữu)
 exports.updateComment = asyncHandler(async (req, res, next) => {
   let comment = await Comment.findById(req.params.id);
-  if (!comment) return next(new ErrorResponse('Comment not found', 404));
+  if (!comment) return next(new ErrorResponse('Không tìm thấy bình luận', 404));
 
   if (comment.author.toString() !== req.user.id) {
-    return next(new ErrorResponse('Not authorized to update this comment', 403));
+    return next(new ErrorResponse('Bạn không có quyền cập nhật bình luận này', 403));
   }
 
   comment = await Comment.findByIdAndUpdate(

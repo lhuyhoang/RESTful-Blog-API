@@ -6,21 +6,21 @@ const UserSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, 'Please add a name'],
+      required: [true, 'Vui lòng nhập tên'],
       trim: true,
-      maxlength: [50, 'Name cannot be more than 50 characters'],
+      maxlength: [50, 'Tên không được vượt quá 50 ký tự'],
     },
     email: {
       type: String,
-      required: [true, 'Please add an email'],
+      required: [true, 'Vui lòng nhập email'],
       unique: true,
       lowercase: true,
-      match: [/^\S+@\S+\.\S+$/, 'Please use a valid email address'],
+      match: [/^\S+@\S+\.\S+$/, 'Vui lòng nhập địa chỉ email hợp lệ'],
     },
     password: {
       type: String,
-      required: [true, 'Please add a password'],
-      minlength: [6, 'Password must be at least 6 characters'],
+      required: [true, 'Vui lòng nhập mật khẩu'],
+      minlength: [6, 'Mật khẩu phải có ít nhất 6 ký tự'],
       select: false,
     },
     role: {
@@ -34,7 +34,7 @@ const UserSchema = new mongoose.Schema(
     },
     bio: {
       type: String,
-      maxlength: [200, 'Bio cannot be more than 200 characters'],
+      maxlength: [200, 'Tiểu sử không được vượt quá 200 ký tự'],
     },
     resetPasswordToken: String,
     resetPasswordExpire: Date,
@@ -42,7 +42,7 @@ const UserSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Hash password before saving
+// Mã hóa mật khẩu trước khi lưu
 UserSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   const salt = await bcrypt.genSalt(10);
@@ -50,14 +50,14 @@ UserSchema.pre('save', async function (next) {
   next();
 });
 
-// Generate JWT token
+// Tạo JWT token
 UserSchema.methods.getSignedJwtToken = function () {
   return jwt.sign({ id: this._id, role: this.role }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE,
   });
 };
 
-// Compare entered password with hashed password
+// So sánh mật khẩu nhập vào với mật khẩu đã mã hóa
 UserSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };

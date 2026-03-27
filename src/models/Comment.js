@@ -4,8 +4,8 @@ const CommentSchema = new mongoose.Schema(
   {
     content: {
       type: String,
-      required: [true, 'Please add a comment'],
-      maxlength: [1000, 'Comment cannot be more than 1000 characters'],
+      required: [true, 'Vui lòng nhập nội dung bình luận'],
+      maxlength: [1000, 'Bình luận không được vượt quá 1000 ký tự'],
       trim: true,
     },
     author: {
@@ -18,6 +18,7 @@ const CommentSchema = new mongoose.Schema(
       ref: 'Post',
       required: true,
     },
+    // Nếu là reply thì trỏ đến comment cha, null nếu là comment gốc
     parentComment: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Comment',

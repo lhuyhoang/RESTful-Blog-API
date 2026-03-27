@@ -5,10 +5,10 @@ const CategorySchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, 'Please add a category name'],
+      required: [true, 'Vui lòng nhập tên danh mục'],
       unique: true,
       trim: true,
-      maxlength: [50, 'Category name cannot be more than 50 characters'],
+      maxlength: [50, 'Tên danh mục không được vượt quá 50 ký tự'],
     },
     slug: {
       type: String,
@@ -16,7 +16,7 @@ const CategorySchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      maxlength: [200, 'Description cannot be more than 200 characters'],
+      maxlength: [200, 'Mô tả không được vượt quá 200 ký tự'],
     },
   },
   {
@@ -26,6 +26,7 @@ const CategorySchema = new mongoose.Schema(
   }
 );
 
+// Tự động tạo slug từ tên danh mục
 CategorySchema.pre('save', function (next) {
   if (this.isModified('name')) {
     this.slug = slugify(this.name, { lower: true, strict: true });
@@ -33,7 +34,7 @@ CategorySchema.pre('save', function (next) {
   next();
 });
 
-// Virtual: post count for this category
+// Virtual: số lượng bài viết thuộc danh mục này
 CategorySchema.virtual('postCount', {
   ref: 'Post',
   localField: '_id',

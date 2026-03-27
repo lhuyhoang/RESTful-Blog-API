@@ -3,7 +3,7 @@ const User = require('../models/User');
 const asyncHandler = require('./asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 
-// Protect routes - verify JWT
+// Bảo vệ route - xác thực JWT
 exports.protect = asyncHandler(async (req, res, next) => {
   let token;
 
@@ -12,28 +12,28 @@ exports.protect = asyncHandler(async (req, res, next) => {
   }
 
   if (!token) {
-    return next(new ErrorResponse('Not authorized to access this route', 401));
+    return next(new ErrorResponse('Bạn không có quyền truy cập route này', 401));
   }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = await User.findById(decoded.id);
     if (!req.user) {
-      return next(new ErrorResponse('User no longer exists', 401));
+      return next(new ErrorResponse('Người dùng không còn tồn tại', 401));
     }
     next();
   } catch (err) {
-    return next(new ErrorResponse('Not authorized to access this route', 401));
+    return next(new ErrorResponse('Bạn không có quyền truy cập route này', 401));
   }
 });
 
-// Grant access to specific roles
+// Phân quyền theo role
 exports.authorize = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
       return next(
         new ErrorResponse(
-          `User role '${req.user.role}' is not authorized to access this route`,
+          `Role '${req.user.role}' không có quyền truy cập route này`,
           403
         )
       );
